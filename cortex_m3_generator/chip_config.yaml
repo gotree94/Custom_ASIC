@@ -1,0 +1,294 @@
+# ============================================================================
+# Cortex-M3 Custom Chip Configuration
+# ============================================================================
+# 이 파일을 수정하여 커스텀 칩에 맞게 설정하세요.
+# 기본값은 STM32F103 (Blue Pill) 기준입니다.
+# ============================================================================
+
+chip:
+  name: "HA2024"                    # 칩 이름 (보청기용 예시)
+  vendor: "MyCompany"               # 제조사
+  core: "cortex-m3"                 # 코어 종류
+  fpu: false                        # FPU 유무 (M3는 없음)
+  mpu: false                        # MPU 유무
+  nvic_prio_bits: 4                 # NVIC 우선순위 비트 수
+
+# ============================================================================
+# 메모리 맵
+# ============================================================================
+memory:
+  flash:
+    name: "FLASH"
+    start: 0x08000000
+    size: 256K                      # 256KB (256K, 128K, 64K 등)
+    page_size: 1K                   # 플래시 페이지 크기
+    
+  sram:
+    name: "SRAM"
+    start: 0x20000000
+    size: 64K                       # 64KB
+    
+  # 추가 메모리 영역 (선택)
+  # sram2:
+  #   name: "SRAM2"
+  #   start: 0x20010000
+  #   size: 16K
+
+# ============================================================================
+# 스택 및 힙 설정
+# ============================================================================
+stack:
+  size: 0x400                       # 1KB 스택
+  
+heap:
+  size: 0x200                       # 512B 힙
+
+# ============================================================================
+# 클럭 설정
+# ============================================================================
+clocks:
+  # 내부 오실레이터
+  hsi:
+    frequency: 8000000              # 8MHz
+    enabled: true
+    
+  # 외부 오실레이터 (선택)
+  hse:
+    frequency: 8000000              # 8MHz
+    enabled: false
+    bypass: false                   # 외부 클럭 소스 사용 시 true
+    
+  # 저속 내부 오실레이터
+  lsi:
+    frequency: 40000                # 40kHz
+    enabled: true
+    
+  # PLL 설정
+  pll:
+    enabled: true
+    source: "hsi"                   # "hsi" 또는 "hse"
+    multiplier: 9                   # PLL 배수 (x9 = 72MHz)
+    
+  # 시스템 클럭
+  sysclk:
+    source: "pll"                   # "hsi", "hse", "pll"
+    frequency: 72000000             # 72MHz
+    
+  # 버스 클럭
+  ahb:
+    prescaler: 1                    # AHB 분주비
+    frequency: 72000000
+    
+  apb1:
+    prescaler: 2                    # APB1 분주비 (max 36MHz)
+    frequency: 36000000
+    
+  apb2:
+    prescaler: 1                    # APB2 분주비
+    frequency: 72000000
+
+# ============================================================================
+# 주변장치 정의
+# ============================================================================
+peripherals:
+  # ----- 시스템 -----
+  RCC:
+    base: 0x40021000
+    description: "Reset and Clock Control"
+    
+  FLASH_CTRL:
+    base: 0x40022000
+    description: "Flash memory interface"
+    
+  PWR:
+    base: 0x40007000
+    description: "Power control"
+
+  # ----- GPIO -----
+  GPIOA:
+    base: 0x40010800
+    description: "General Purpose I/O Port A"
+    
+  GPIOB:
+    base: 0x40010C00
+    description: "General Purpose I/O Port B"
+    
+  GPIOC:
+    base: 0x40011000
+    description: "General Purpose I/O Port C"
+    
+  GPIOD:
+    base: 0x40011400
+    description: "General Purpose I/O Port D"
+
+  # ----- 타이머 -----
+  TIM1:
+    base: 0x40012C00
+    description: "Advanced-control timer"
+    
+  TIM2:
+    base: 0x40000000
+    description: "General-purpose timer"
+    
+  TIM3:
+    base: 0x40000400
+    description: "General-purpose timer"
+    
+  TIM4:
+    base: 0x40000800
+    description: "General-purpose timer"
+
+  # ----- 통신 -----
+  USART1:
+    base: 0x40013800
+    description: "Universal synchronous asynchronous receiver transmitter"
+    
+  USART2:
+    base: 0x40004400
+    description: "Universal synchronous asynchronous receiver transmitter"
+    
+  USART3:
+    base: 0x40004800
+    description: "Universal synchronous asynchronous receiver transmitter"
+    
+  SPI1:
+    base: 0x40013000
+    description: "Serial peripheral interface"
+    
+  SPI2:
+    base: 0x40003800
+    description: "Serial peripheral interface"
+    
+  I2C1:
+    base: 0x40005400
+    description: "Inter-integrated circuit"
+    
+  I2C2:
+    base: 0x40005800
+    description: "Inter-integrated circuit"
+
+  # ----- 오디오 (보청기용) -----
+  I2S:
+    base: 0x40013000                # SPI1과 공유 (I2S 모드)
+    description: "Inter-IC Sound interface"
+    
+  # ----- ADC (마이크 입력) -----
+  ADC1:
+    base: 0x40012400
+    description: "Analog-to-digital converter"
+    channels: 16
+    resolution: 12                  # 12-bit
+    
+  ADC2:
+    base: 0x40012800
+    description: "Analog-to-digital converter"
+    channels: 16
+    resolution: 12
+
+  # ----- DAC (스피커 출력) -----
+  DAC:
+    base: 0x40007400
+    description: "Digital-to-analog converter"
+    channels: 2
+    resolution: 12
+
+  # ----- DMA -----
+  DMA1:
+    base: 0x40020000
+    description: "Direct memory access controller"
+    channels: 7
+    
+  # ----- 기타 -----
+  IWDG:
+    base: 0x40003000
+    description: "Independent watchdog"
+    
+  WWDG:
+    base: 0x40002C00
+    description: "Window watchdog"
+    
+  RTC:
+    base: 0x40002800
+    description: "Real-time clock"
+    
+  EXTI:
+    base: 0x40010400
+    description: "External interrupt/event controller"
+    
+  AFIO:
+    base: 0x40010000
+    description: "Alternate function I/O"
+
+# ============================================================================
+# 인터럽트 벡터 테이블
+# ============================================================================
+# Cortex-M3 시스템 예외는 고정, 여기서는 주변장치 인터럽트만 정의
+# IRQ 번호는 0부터 시작 (NVIC IRQ0 = 벡터 테이블 16번째)
+# ============================================================================
+interrupts:
+  # 번호: [이름, 설명]
+  0:  [WWDG_IRQn,           "Window Watchdog"]
+  1:  [PVD_IRQn,            "PVD through EXTI Line detect"]
+  2:  [TAMPER_IRQn,         "Tamper"]
+  3:  [RTC_IRQn,            "RTC global"]
+  4:  [FLASH_IRQn,          "Flash"]
+  5:  [RCC_IRQn,            "RCC global"]
+  6:  [EXTI0_IRQn,          "EXTI Line 0"]
+  7:  [EXTI1_IRQn,          "EXTI Line 1"]
+  8:  [EXTI2_IRQn,          "EXTI Line 2"]
+  9:  [EXTI3_IRQn,          "EXTI Line 3"]
+  10: [EXTI4_IRQn,          "EXTI Line 4"]
+  11: [DMA1_Channel1_IRQn,  "DMA1 Channel 1"]
+  12: [DMA1_Channel2_IRQn,  "DMA1 Channel 2"]
+  13: [DMA1_Channel3_IRQn,  "DMA1 Channel 3"]
+  14: [DMA1_Channel4_IRQn,  "DMA1 Channel 4"]
+  15: [DMA1_Channel5_IRQn,  "DMA1 Channel 5"]
+  16: [DMA1_Channel6_IRQn,  "DMA1 Channel 6"]
+  17: [DMA1_Channel7_IRQn,  "DMA1 Channel 7"]
+  18: [ADC1_2_IRQn,         "ADC1 and ADC2"]
+  19: [USB_HP_CAN1_TX_IRQn, "USB High Priority or CAN1 TX"]
+  20: [USB_LP_CAN1_RX0_IRQn,"USB Low Priority or CAN1 RX0"]
+  21: [CAN1_RX1_IRQn,       "CAN1 RX1"]
+  22: [CAN1_SCE_IRQn,       "CAN1 SCE"]
+  23: [EXTI9_5_IRQn,        "EXTI Lines 9:5"]
+  24: [TIM1_BRK_IRQn,       "TIM1 Break"]
+  25: [TIM1_UP_IRQn,        "TIM1 Update"]
+  26: [TIM1_TRG_COM_IRQn,   "TIM1 Trigger and Commutation"]
+  27: [TIM1_CC_IRQn,        "TIM1 Capture Compare"]
+  28: [TIM2_IRQn,           "TIM2 global"]
+  29: [TIM3_IRQn,           "TIM3 global"]
+  30: [TIM4_IRQn,           "TIM4 global"]
+  31: [I2C1_EV_IRQn,        "I2C1 Event"]
+  32: [I2C1_ER_IRQn,        "I2C1 Error"]
+  33: [I2C2_EV_IRQn,        "I2C2 Event"]
+  34: [I2C2_ER_IRQn,        "I2C2 Error"]
+  35: [SPI1_IRQn,           "SPI1 global"]
+  36: [SPI2_IRQn,           "SPI2 global"]
+  37: [USART1_IRQn,         "USART1 global"]
+  38: [USART2_IRQn,         "USART2 global"]
+  39: [USART3_IRQn,         "USART3 global"]
+  40: [EXTI15_10_IRQn,      "EXTI Lines 15:10"]
+  41: [RTC_Alarm_IRQn,      "RTC Alarm through EXTI"]
+  42: [USBWakeUp_IRQn,      "USB Wakeup from suspend"]
+  # 보청기 전용 인터럽트 (예시)
+  43: [I2S_IRQn,            "I2S global (Audio)"]
+  44: [DSP_IRQn,            "DSP processing complete"]
+  45: [CODEC_IRQn,          "Audio codec"]
+
+# ============================================================================
+# 부트 설정
+# ============================================================================
+boot:
+  # 벡터 테이블 리매핑
+  vtor_remap: false                 # VTOR 사용 여부
+  
+  # 부트 모드 핀 (BOOT0, BOOT1)
+  boot_from_flash: true
+  
+  # 시스템 초기화 옵션
+  init_data_section: true           # .data 섹션 초기화
+  init_bss_section: true            # .bss 섹션 제로 초기화
+  call_constructors: true           # C++ 생성자 호출
+  
+  # 디버그 옵션
+  enable_semihosting: false         # 세미호스팅 지원
