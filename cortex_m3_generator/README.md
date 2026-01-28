@@ -1,6 +1,6 @@
 # Cortex-M3 Firmware Generator
 
-커스텀 Cortex-M3 기반 칩(보청기 칩 등)을 위한 펌웨어 기본 파일 생성기입니다.
+커스텀 Cortex-M3 기반 칩을 위한 펌웨어 기본 파일 생성기입니다.
 
 ---
 
@@ -588,7 +588,7 @@ peripherals:
     base: 0x40000000
     description: "General-purpose timer"
     
-  # ADC/DAC (보청기용 오디오)
+  # ADC/DAC (오디오)
   ADC1:
     base: 0x40012400
     description: "ADC1"
@@ -635,7 +635,7 @@ interrupts:
   37: [USART1_IRQn,         "USART1 global"]
   38: [USART2_IRQn,         "USART2 global"]
   
-  # 보청기 전용 인터럽트 추가
+  # 인터럽트 추가
   43: [I2S_IRQn,            "I2S Audio"]
   44: [DSP_IRQn,            "DSP complete"]
   45: [CODEC_IRQn,          "Audio codec"]
@@ -779,7 +779,7 @@ memory:
     size: 128K              # 128KB로 증가
 ```
 
-### 6.4 보청기 칩 특화 설정 예시
+### 6.4 특화 설정 예시
 
 ```yaml
 chip:
